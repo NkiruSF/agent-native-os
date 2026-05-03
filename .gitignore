@@ -1,0 +1,20 @@
+# Secrets - never commit
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Python (if you end up using it for any agent script)
+__pycache__/
+*.pyc
+.venv/
+venv/
