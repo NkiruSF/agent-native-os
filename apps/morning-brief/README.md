@@ -60,6 +60,21 @@ If all of that worked, you've deployed your capstone. From here, generate a real
 
 ---
 
+## Running locally (after first-time setup)
+
+`.env.local` contains `op://Workshop-Keys/...` references, not real secrets. The 1Password CLI resolves them at runtime, so always launch the dev server through `op run`:
+
+```bash
+cd apps/morning-brief
+op run --env-file=.env.local -- npm run dev
+```
+
+Prerequisites: 1Password desktop running and unlocked, CLI integration enabled (Settings -> Developer -> "Integrate with 1Password CLI"). Verify with `op vault list` -- if it returns your vaults, you're good.
+
+If you ever overwrite `.env.local` with `cp .env.example .env.local`, you'll need to restore the references (or rerun the migration). The references are checked into the file in this repo, so `git checkout apps/morning-brief/.env.local` is the fastest fix.
+
+---
+
 ## Generating a real brief
 
 The slash command `/build-morning-brief` lives at `configs/commands/build-morning-brief.md` (on a separate worker branch awaiting review). When merged, it walks Claude Code through compiling sources into the canonical JSON contract, posting to `POST /api/briefs`, then triggering `POST /api/deliver/telegram`.
@@ -87,13 +102,18 @@ Until then, you can hand-craft a brief by following the shape in `blueprints/mor
 
 ---
 
-## Secrets posture (1Password vs .env vs Infisical)
+## Secrets posture
 
-- **1Password (recommended for production):** store the four secrets in a vault item. Pull into your shell with `op read` or use the 1Password Vercel integration. This is the default for any AIBL ops work.
-- **.env.local (workshop fallback):** fine for Sunday. The file is in `.gitignore` and never gets committed. If you accidentally commit it, rotate the Telegram bot token and the Supabase service-role key immediately.
-- **Infisical (post-class team-scale path):** when you have multiple devs sharing the same project, move secrets into Infisical and replace `.env.local` with the Infisical CLI. Vercel has a first-party integration.
+Local secrets live in 1Password under the **Workshop-Keys** vault, in two items:
 
-Never paste secrets into Claude chat. Never paste secrets into Slack. Never paste secrets into a GitHub issue. Use the Vercel dashboard, Supabase dashboard, or 1Password.
+- **Morning-Brief-Supabase** -- fields: `url`, `anon_key`, `service_role_key`
+- **Morning-Brief-Telegram** -- fields: `bot_token`, `chat_id`
+
+`.env.local` contains only `op://Workshop-Keys/...` references. `op run` resolves them at process start (see "Running locally" above). Production env vars live in Vercel separately and are unaffected by local 1Password state.
+
+If you accidentally commit a real secret, rotate the Telegram bot token and the Supabase service-role key immediately, then re-store the new values in 1Password.
+
+Never paste secrets into Claude chat, Slack, or GitHub issues. Use the Vercel dashboard, Supabase dashboard, or 1Password.
 
 ---
 
