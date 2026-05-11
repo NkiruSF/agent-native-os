@@ -92,6 +92,7 @@ def fetch_caption(video: dict, channel: dict, work_dir: Path) -> tuple[dict, str
         "--sub-format",
         "vtt",
         "--dump-json",
+        "--no-simulate",
         "-o",
         str(output),
         video["url"],
@@ -173,7 +174,13 @@ def main() -> None:
     parser.add_argument("--vault", type=Path, default=Path("vault"))
     parser.add_argument("--max-videos", type=int, default=3)
     parser.add_argument("--work-dir", type=Path, default=Path(".cairns-work"))
+    parser.add_argument("--since-days", type=int, default=None, help="Skip videos uploaded more than N days ago. Default: no filter.")
     args = parser.parse_args()
+    cutoff_yyyymmdd = None
+    if args.since_days is not None:
+        from datetime import timedelta
+        cutoff = datetime.now(timezone.utc) - timedelta(days=args.since_days)
+        cutoff_yyyymmdd = cutoff.strftime("%Y%m%d")
     if not shutil.which("yt-dlp"):
         raise SystemExit("yt-dlp is required. Install it with: brew install yt-dlp")
     if not args.config.exists():
@@ -192,6 +199,9 @@ def main() -> None:
             if not fetched:
                 continue
             meta, body = fetched
+            if cutoff_yyyymmdd and (meta.get("upload_date") or "") < cutoff_yyyymmdd:
+                print(f"Skipped (older than --since-days): {video['video_id']} uploaded {meta.get('upload_date')}", file=sys.stderr)
+                continue
             row = write_source(args.vault, channel, meta, body)
             rows.append(row)
             print(f"Wrote L3 {row['obsidian_path']}")
