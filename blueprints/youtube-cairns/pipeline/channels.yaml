@@ -1,0 +1,75 @@
+channels:
+  # AI Visibility / GEO / AEO — Found & Trusted intel
+  - slug: sejournal
+    name: Search Engine Journal
+    url: https://www.youtube.com/@searchenginejournal
+    status: active
+    max_videos: 2
+
+  - slug: neilpatel
+    name: Neil Patel
+    url: https://www.youtube.com/@neilpatel
+    status: active
+    max_videos: 2
+
+  - slug: ahrefs
+    name: Ahrefs
+    url: https://www.youtube.com/@AhrefsCom
+    status: active
+    max_videos: 2
+
+  - slug: marketing-against-the-grain
+    name: Marketing Against the Grain
+    url: https://www.youtube.com/@MATGpod
+    status: active
+    max_videos: 2
+
+  # General AI
+  - slug: ai-explained
+    name: AI Explained
+    url: https://www.youtube.com/@aiexplained-official
+    status: active
+    max_videos: 2
+
+  - slug: matt-wolfe
+    name: Matt Wolfe
+    url: https://www.youtube.com/@mreflow
+    status: active
+    max_videos: 2
+
+  # Agent of One — personal enterprise / agent building
+  - slug: ai-jason
+    name: AI Jason
+    url: https://www.youtube.com/@AIJasonZ
+    status: active
+    max_videos: 2
+
+  - slug: greg-isenberg
+    name: Greg Isenberg
+    url: https://www.youtube.com/@GregIsenberg
+    status: active
+    max_videos: 2
+
+  - slug: nick-saraev
+    name: Nick Saraev
+    url: https://www.youtube.com/@nicksaraev
+    status: active
+    max_videos: 2
+
+  - slug: grace-yeung
+    name: Grace Yeung
+    url: https://www.youtube.com/@graceyeungyl
+    status: active
+    max_videos: 2
+
+  - slug: jeff-su
+    name: Jeff Su
+    url: https://www.youtube.com/@JeffSu
+    status: active
+    max_videos: 2
+
+  - slug: ai-founders
+    name: AI Founders
+    url: https://www.youtube.com/@AIFoundersHQ
+    status: active
+    max_videos: 2
