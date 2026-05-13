@@ -47,7 +47,7 @@ Run the youtube-cairns capture pipeline and synthesise today's brief. Writes int
 5. **Synthesise the daily brief.** `echo "[daily-intel] Step 5: synthesising"`. Group by bucket using `channel_slug`:
    - **AI Visibility / GEO / AEO** — `sejournal`, `neilpatel`, `ahrefs`, `marketing-against-the-grain`
    - **General AI** — `ai-explained`, `matt-wolfe`
-   - **Agent of One** — `ai-jason`, `greg-isenberg`, `nick-saraev`, `grace-yeung`, `jeff-su`, `ai-founders`
+   - **Agent of One** — `ai-jason`, `greg-isenberg`, `nick-saraev`, `grace-leung`, `jeff-su`, `ai-founders`
 
    **Format — terse. Aim for ~40 words per item.** For each item under each bucket:
 

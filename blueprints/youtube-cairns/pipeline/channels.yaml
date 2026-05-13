@@ -56,9 +56,9 @@ channels:
     status: active
     max_videos: 2
 
-  - slug: grace-yeung
-    name: Grace Yeung
-    url: https://www.youtube.com/@graceyeungyl
+  - slug: grace-leung
+    name: Grace Leung
+    url: https://www.youtube.com/@graceleungyl
     status: active
     max_videos: 2
 
