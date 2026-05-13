@@ -19,27 +19,32 @@ Run the youtube-cairns capture pipeline and synthesise today's brief. Writes int
    - `TZ=Europe/London date +%Y-%m-%d` → use as `<DATE>` and frontmatter `date`.
    - `TZ=Europe/London date +'%a, %b %-d, %Y'` → use as the brief title.
 
-2. **Run the capture pipeline** from the worktree root, with PATH prepended:
+2. **Run the capture pipeline** from the main repo root, with PATH prepended. Print a progress marker before and after:
    ```
+   echo "[daily-intel] Step 2: capture starting"
    export PATH="/c/Users/nkiru/AppData/Local/Programs/Python/Python310/Scripts:$PATH"
-   cd "C:/Users/nkiru/GitHub/agent-native-os/.claude/worktrees/xenodochial-saha-f61e05/blueprints/youtube-cairns"
+   cd "C:/Users/nkiru/GitHub/agent-native-os/blueprints/youtube-cairns"
    "/c/Users/nkiru/AppData/Local/Programs/Python/Python310/python.exe" pipeline/build.py \
      --config pipeline/channels.yaml \
      --vault "C:/Users/nkiru/ClaudeCode/SECONDBRAIN/youtube-vault" \
      --since-days 14
    "/c/Users/nkiru/AppData/Local/Programs/Python/Python310/python.exe" pipeline/enrich.py \
      --vault "C:/Users/nkiru/ClaudeCode/SECONDBRAIN/youtube-vault"
+   echo "[daily-intel] Step 2: capture complete"
    ```
    Capture stdout. If `Sources captured: 0`, skip to step 6 with "no new intel today."
 
 3. **Read the manifest** to know what was captured this run:
+   - `echo "[daily-intel] Step 3: reading manifest"`
    - Read `C:/Users/nkiru/ClaudeCode/SECONDBRAIN/youtube-vault/manifests/sources.json` — this file contains ONLY this run's captures. Each row has `obsidian_path`, `title`, `url`, `channel_slug`, `channel_name`, `video_id`.
+   - If the manifest has more than 12 rows, pre-rank by signal density (title + channel relevance to AI Visibility / Agent of One first, then General AI) and pick the **top 12 candidates** before step 4. This keeps context bounded.
 
-4. **Read each L3 transcript** referenced by the manifest:
-   - For each row, read `<vault>/<obsidian_path>` (e.g. `<vault>/raw/transcripts/ai-explained/<id> - <slug>.md`).
+4. **Read the top candidate L3 transcripts** (max 12) referenced from step 3:
+   - `echo "[daily-intel] Step 4: reading <N> transcripts"`
+   - For each candidate row, read `<vault>/<obsidian_path>` using `Read` with `limit: 800`. That caps each file at ~800 lines of captions (≈10–15 min of video — well past the substantive content for most channels).
    - The transcript body follows the `## Transcript` heading.
 
-5. **Synthesise the daily brief.** Group by bucket using `channel_slug`:
+5. **Synthesise the daily brief.** `echo "[daily-intel] Step 5: synthesising"`. Group by bucket using `channel_slug`:
    - **AI Visibility / GEO / AEO** — `sejournal`, `neilpatel`, `ahrefs`, `marketing-against-the-grain`
    - **General AI** — `ai-explained`, `matt-wolfe`
    - **Agent of One** — `ai-jason`, `greg-isenberg`, `nick-saraev`, `grace-yeung`, `jeff-su`, `ai-founders`
@@ -66,7 +71,7 @@ Run the youtube-cairns capture pipeline and synthesise today's brief. Writes int
    - Do NOT pad with extra context, framing, or "notes on this brief" sections. Brief reads tight or it doesn't get read.
    - If a transcript is mostly host chatter / sponsor reads with little substance, the item still gets one terse sentence — don't try to manufacture depth.
 
-6. **Write the brief** to `C:/Users/nkiru/ClaudeCode/SECONDBRAIN/daily-reviews/<DATE>-intel.md` with frontmatter:
+6. **Write the brief** (`echo "[daily-intel] Step 6: writing brief"`) to `C:/Users/nkiru/ClaudeCode/SECONDBRAIN/daily-reviews/<DATE>-intel.md` with frontmatter:
    ```
    ---
    date: <DATE>
@@ -81,7 +86,7 @@ Run the youtube-cairns capture pipeline and synthesise today's brief. Writes int
    ```
    If step 2 captured zero sources, write a minimal note: `# Daily Intel — <TITLE>\n\nNo new intel today.`
 
-7. **Send Telegram ping.** Source the main repo-root `.env` (NOT the worktree — gitignored secrets don't get copied into worktrees):
+7. **Send Telegram ping** (`echo "[daily-intel] Step 7: sending Telegram"`). Source the main repo-root `.env` (NOT the worktree — gitignored secrets don't get copied into worktrees):
    ```
    set -a
    source "C:/Users/nkiru/GitHub/agent-native-os/.env"
@@ -92,7 +97,7 @@ Run the youtube-cairns capture pipeline and synthesise today's brief. Writes int
    ```
    Capture `message_id` from the response. Keep the text ASCII — emoji can mangle on this Windows + Bash combo.
 
-8. **Final report**: card count, bucket breakdown, brief path, Telegram message ID.
+8. **Final report** (`echo "[daily-intel] Step 8: done"`): card count (captured + read), bucket breakdown, brief path, Telegram message ID.
 
 ## Hard rules
 
