@@ -93,7 +93,7 @@ Run the youtube-cairns capture pipeline and synthesise today's brief. Writes int
    set +a
    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
      --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-     --data-urlencode "text=Daily intel ready - <N> new cards. Top: <top item title>. See SECONDBRAIN/daily-reviews/<DATE>-intel.md"
+     --data-urlencode "text=Daily intel ready - <N> new cards. Top: <top item title>. Open: obsidian://open?vault=SECONDBRAIN&file=daily-reviews/<DATE>-intel.md"
    ```
    Capture `message_id` from the response. Keep the text ASCII — emoji can mangle on this Windows + Bash combo.
 
