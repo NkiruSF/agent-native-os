@@ -243,6 +243,86 @@ body {
 }
 .stamp.warn { border-color: var(--caution); color: var(--caution); }
 
+/* intel-markdown: rendered markdown for the "What I should watch" section.
+   Structure produced by marked: intro <p>, bucket <h2>, item <h3> + <p> × 3 */
+.intel-markdown > p:first-child {
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.intel-markdown h2 {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--caution);
+  margin-top: 1.2rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.intel-markdown h3 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-top: 0.9rem;
+  margin-bottom: 0.25rem;
+  padding-left: 0.7rem;
+  border-left: 3px solid var(--border);
+}
+
+.intel-markdown h3 a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ink-3);
+  text-underline-offset: 2px;
+}
+
+.intel-markdown h3 a:hover {
+  text-decoration-color: var(--ink);
+}
+
+.intel-markdown p {
+  font-size: 0.83rem;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin-bottom: 0.15rem;
+  padding-left: 0.7rem;
+}
+
+.intel-markdown p strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ↳ L2 card links — mono, muted */
+.intel-markdown p a {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  color: var(--ink-3);
+  text-decoration: none;
+}
+
+.intel-markdown p a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* "+N additional cards" overflow notice */
+.intel-markdown > p:last-child em {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  font-style: normal;
+  color: var(--ink-3);
+}
+
 /* CTA button. Caution red, hard offset, snaps in on hover. */
 .btn-primary {
   display: inline-flex;
