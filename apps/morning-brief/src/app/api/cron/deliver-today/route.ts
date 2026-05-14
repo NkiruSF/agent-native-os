@@ -35,6 +35,7 @@ export async function GET() {
       date: brief.date,
       title: brief.title,
       top_priority: brief.top_priority,
+      url: "https://nkiru-morning-brief.vercel.app",
     });
     const result = await sendTelegramMessage(text);
 
