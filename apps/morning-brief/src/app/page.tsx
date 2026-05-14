@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase";
+import { marked } from "marked";
 
 export const dynamic = "force-dynamic";
 
@@ -8,12 +9,14 @@ type TimeSensitiveItem = { action?: string; subject?: string; sender?: string; s
 type FyiItem = { note?: string; subject?: string; sender?: string; source?: string; title?: string; detail?: string };
 type CalendarItem = { time?: string; summary?: string };
 type SkippedInfo = { count?: number; senders?: string[] };
+type WhatToWatch = { summary_md?: string; card_count?: number; top_item_title?: string; brief_date?: string };
 
 type RichSections = {
   time_sensitive?: TimeSensitiveItem[];
   fyi?: FyiItem[];
   calendar?: CalendarItem[];
   skipped?: SkippedInfo;
+  what_to_watch?: WhatToWatch;
 };
 
 type RichBrief = {
@@ -86,6 +89,7 @@ function BriefCard({ brief }: { brief: RichBrief }) {
   const fyi = sections.fyi ?? [];
   const calendar = sections.calendar ?? [];
   const skipped = sections.skipped;
+  const whatToWatch = sections.what_to_watch;
 
   return (
     <div className="file-tab-card tilt-left" style={{ marginTop: "1.6rem" }}>
@@ -150,8 +154,24 @@ function BriefCard({ brief }: { brief: RichBrief }) {
         </div>
       )}
 
+      {whatToWatch?.summary_md && (
+        <div style={{ marginTop: "1.4rem", paddingTop: "1.2rem", borderTop: "2px solid var(--border)" }}>
+          <h3 className="font-display" style={{ fontSize: "1.05rem", marginBottom: "0.5rem" }}>📺 What I should watch</h3>
+          {whatToWatch.brief_date && (
+            <div className="font-mono" style={{ fontSize: "0.7rem", color: "var(--ink-3)", marginBottom: "0.6rem" }}>
+              From daily-intel run on {whatToWatch.brief_date} · {whatToWatch.card_count ?? 0} cards captured
+            </div>
+          )}
+          <div
+            className="intel-markdown"
+            style={{ color: "var(--ink-2)", fontSize: "0.9rem", lineHeight: 1.55 }}
+            dangerouslySetInnerHTML={{ __html: marked.parse(whatToWatch.summary_md, { async: false }) as string }}
+          />
+        </div>
+      )}
+
       {skipped && (skipped.count ?? 0) > 0 && (
-        <div className="font-mono" style={{ fontSize: "0.72rem", color: "var(--ink-3)", borderTop: "1px dashed var(--ink-3)", paddingTop: "0.6rem" }}>
+        <div className="font-mono" style={{ fontSize: "0.72rem", color: "var(--ink-3)", borderTop: "1px dashed var(--ink-3)", paddingTop: "0.6rem", marginTop: "1rem" }}>
           {skipped.count} items skipped ({(skipped.senders ?? []).slice(0, 4).join(", ")}{(skipped.senders?.length ?? 0) > 4 ? ` +${(skipped.senders?.length ?? 0) - 4} more` : ""})
         </div>
       )}
