@@ -20,12 +20,31 @@ Run the manual morning brief flow end-to-end. Same pattern we proved twice - rea
    - query: `in:inbox newer_than:2d -subject:"Telegram bot"`
    - pageSize: `15`
 
+3b. **Fetch the latest daily intel** from Supabase via `execute_sql` (project `cxxquxhgcbddxjxbqgcc`):
+   ```sql
+   SELECT brief_date, summary_md, card_count, top_item_title
+   FROM public.intel_sections
+   ORDER BY brief_date DESC
+   LIMIT 1;
+   ```
+   Store the result as `intel`. If no row, `intel = null`. Note: the daily-intel pipeline runs at 8am London — after this brief fires at 7am — so `intel` will normally be the previous day's run. That is expected and fine: one-day lag is by design.
+
 4. Compile a brief object filtered through Nkiru's priorities (per CLAUDE.md):
    - **Skip:** newsletters, marketing, automated security alerts, OAuth notices.
    - **Time-Sensitive section:** items needing response today, hard deadlines, final-call language.
    - **FYI section:** items relevant to Found & Trusted, Barnardo's, or Nkiru's stated priorities.
    - **top_priority:** the single most important decision or action for today.
    - **Skipped section:** count + senders.
+   - **what_to_watch section:** if `intel` is non-null, include:
+     ```
+     what_to_watch: {
+       summary_md: <intel.summary_md>,
+       card_count: <intel.card_count>,
+       top_item_title: <intel.top_item_title>,
+       brief_date: <intel.brief_date>
+     }
+     ```
+     If `intel` is null, omit `what_to_watch` entirely.
 
 5. **Critical security rule:** never include raw API tokens, JWT strings, or bot tokens from email snippets. If you see anything that looks like a credential, write "filtered N self-sent items containing credentials" without quoting.
 
