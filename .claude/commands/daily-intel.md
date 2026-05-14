@@ -86,29 +86,35 @@ Run the youtube-cairns capture pipeline and synthesise today's brief. Writes int
    ```
    If step 2 captured zero sources, write a minimal note: `# Daily Intel — <TITLE>\n\nNo new intel today.`
 
-7. **Send Telegram ping** (`echo "[daily-intel] Step 7: sending Telegram"`). Source the main repo-root `.env` (NOT the worktree — gitignored secrets don't get copied into worktrees):
-   ```
-   set -a
-   source "C:/Users/nkiru/GitHub/agent-native-os/.env"
-   set +a
-   curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
-     --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-     --data-urlencode "text=Daily intel ready - <N> new cards. Top: <top item title>. Open: obsidian://open?vault=SECONDBRAIN&file=daily-reviews/<DATE>-intel.md"
-   ```
-   Capture `message_id` from the response. Keep the text ASCII — emoji can mangle on this Windows + Bash combo.
+7. **Insert into Supabase `intel_sections`** so the morning-brief routine can pick it up tomorrow. Project: `cxxquxhgcbddxjxbqgcc`. Use the Supabase MCP `execute_sql` tool with `ON CONFLICT (brief_date) DO UPDATE` so same-day reruns overwrite cleanly. Use dollar-quoting (`$intel$...$intel$`) for the `summary_md` text so markdown apostrophes don't break the SQL.
 
-8. **Final report** (`echo "[daily-intel] Step 8: done"`): card count (captured + read), bucket breakdown, brief path, Telegram message ID.
+   The `summary_md` value is the markdown body of the brief WITHOUT the YAML frontmatter — start at the `# Daily Intel —` heading and include everything below it.
+
+   ```sql
+   INSERT INTO public.intel_sections (brief_date, summary_md, card_count, channels, top_item_title)
+   VALUES ('<DATE>', $intel$<MARKDOWN BODY>$intel$, <N>, ARRAY[<channel_slugs>], '<TOP ITEM TITLE>')
+   ON CONFLICT (brief_date) DO UPDATE
+   SET summary_md = EXCLUDED.summary_md,
+       card_count = EXCLUDED.card_count,
+       channels = EXCLUDED.channels,
+       top_item_title = EXCLUDED.top_item_title,
+       updated_at = now()
+   RETURNING brief_date;
+   ```
+
+   If step 2 captured zero sources, still insert a row with `summary_md` = "No new intel today." and `card_count` = 0 — the morning-brief routine needs a deterministic row to read.
+
+8. **Final report**: card count (captured + read), bucket breakdown, brief path, Supabase row written. **No Telegram ping** — morning-brief now delivers the intel as a section of its daily brief (~1-day lag).
 
 ## Hard rules
 
-- Never print `TELEGRAM_TOKEN` or any other secret to the terminal. Shell variable substitution only.
-- Names-only inspection of `.env` files (`grep -oE '^[A-Z_]+=' <file>`). Never `cat` them.
+- Never print secrets to the terminal. Use Supabase MCP `execute_sql` for the database write — do not curl Supabase REST endpoints with the service key.
 - The blueprint's `enrich.py` writes its own L1 inside `<vault>/cairns/L1/`. That's inside the sub-vault (`SECONDBRAIN/youtube-vault/cairns/L1/`) — it must NOT write to `SECONDBRAIN/cairns/L1/`. The `--vault` flag is the guarantee; do not run `enrich.py` against the main vault root.
 - Do not edit `SECONDBRAIN/cairns/L1/` or `SECONDBRAIN/cairns/L1/INDEX.md` from this command. Those are human-curated.
 - If `build.py` fails with `yt-dlp` not on PATH, the PATH prepend in step 2 was lost — re-check that it's in the same Bash invocation as the python call.
-- If `Sources captured: 0`, do not write garbage — go to step 6 with the "no new intel today" path and still ping Telegram.
+- If `Sources captured: 0`, still write the vault file AND insert the Supabase row with "No new intel today." — the morning-brief routine needs a deterministic row.
 
-## Open issues for v1
+## Open issues
 
-- Re-running on the same day re-fetches the same videos (no per-video dedup). Acceptable for v1. Add dedup later if it bites.
-- Only one channel (`ai-explained`) is configured in `channels.yaml`. After this command runs end-to-end successfully, expand to the locked 12-channel list.
+- Re-running on the same day re-fetches the same videos (no per-video dedup). `ON CONFLICT` on the Supabase write handles same-day reruns cleanly. Add per-video dedup later if it bites.
+- Some channels surface old videos in "latest" listing; the `--since-days 14` filter mitigates but doesn't fully fix. Watch for this in capture issues.
