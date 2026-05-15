@@ -44,6 +44,7 @@ Run the manual morning brief flow end-to-end. Same pattern we proved twice - rea
        brief_date: <intel.brief_date>
      }
      ```
+     **CRITICAL:** `summary_md` must be copied **verbatim** from the database row — the exact string, character for character. Do NOT summarise, paraphrase, condense, or rewrite it. It is pre-written structured markdown and must reach the database intact.
      If `intel` is null, omit `what_to_watch` entirely.
 
 5. **Critical security rule:** never include raw API tokens, JWT strings, or bot tokens from email snippets. If you see anything that looks like a credential, write "filtered N self-sent items containing credentials" without quoting.
